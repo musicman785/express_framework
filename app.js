@@ -17,43 +17,54 @@ app.use(express.json());
 //Uses express static method for index.js and css folders
 app.use(express.static(path.join(__dirname, "public")));
 //Array to hold note objects created
-let notes = [];
+
 
 
 // API call routes
 // =============================================================
-app.get("/api/notes", (req, res) => { 
+app.get("/api/notes", (req, res) => {
     fs.readFile(__dirname + "/db/db.json", (err, data) => {
-        if(err)
-        throw err;
+        if (err)
+            throw err;
         let noteData = JSON.parse(data);
         res.json(noteData);
     })
-   
+
 });
-   // Question: why is the array notes being overwritten? 
+
+// Question: why is the array notes being overwritten? 
 app.post("/api/notes", (req, res) => {
     let newNote = req.body;
-
-    notes.push(newNote);
-   
-    notes = JSON.stringify(notes);
-   
-    res.json(JSON.parse(notes));
-
-    fs.writeFile(__dirname + "/db/db.json", notes, (err, data) => {
-        if (err) 
-        throw err;
-        console.log(newNote);
+    
+    fs.readFile(__dirname + "/db/db.json", "utf8", (err, data) => {
+        if (err)
+            throw err;
+       let notes = JSON.parse(data);
         
+       notes.push(newNote);
+        
+       console.log(notes);
+
+        
+
+    fs.writeFile(__dirname + "/db/db.json", JSON.stringify(notes), (err, data) => {
+            if (err)
+                throw err;
+            else{
+                res.json(notes);
+            }
+        })
     })
-    console.log(notes);
-  }); 
+
+
+
+
+});
 
 // Routes  Question: Do I need a 404 error route?
 // =============================================================
 app.get("/notes", (req, res) => {
-  res.sendFile(__dirname + "/public/notes.html");
+    res.sendFile(__dirname + "/public/notes.html");
 });
 
 app.get("*", (req, res) => {
@@ -70,9 +81,9 @@ app.get("/notes", (req, res) => {
 
 
 
-  
+
 // Starts the server to begin listening
 // =============================================================
-app.listen(PORT, function() {
+app.listen(PORT, function () {
     console.log("App listening on PORT " + PORT);
-  });
+});
