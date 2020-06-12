@@ -33,31 +33,61 @@ app.get("/api/notes", (req, res) => {
 });
 
 // Question: why is the array notes being overwritten? 
+
+//API POST call routes 
+//===============================================================
 app.post("/api/notes", (req, res) => {
+
     let newNote = req.body;
-    
+
     fs.readFile(__dirname + "/db/db.json", "utf8", (err, data) => {
         if (err)
             throw err;
-       let notes = JSON.parse(data);
-        
-       notes.push(newNote);
-        
-       console.log(notes);
 
-        
+        let notes = JSON.parse(data)
 
-    fs.writeFile(__dirname + "/db/db.json", JSON.stringify(notes), (err, data) => {
+        notes.push(newNote);
+
+
+
+        fs.writeFile(__dirname + "/db/db.json", JSON.stringify(notes), (err, data) => {
             if (err)
                 throw err;
-            else{
+            else {
                 res.json(notes);
             }
         })
     })
 
+});
+app.delete("/api/notes/:Title", (req, res) => {
+    
+    fs.readFile(__dirname + "/db/db.json", "utf8", (err, data) => {
+        if (err)
+            throw err;
 
+            const reqTitle = req.params.Title
+             
+            let notes = JSON.parse(data);
+            
+             notes =  notes.filter(note => {
+            
+                return note.Title.toLowerCase() !== reqTitle.toLowerCase();
+            
+            });
+           
+            res.json(notes);
+            
+    fs.writeFile(__dirname + "/db/db.json", JSON.stringify(notes), (err, data) => {
+                if (err)
+                    throw err;
+                else {
+                    res.json(notes);
+                }
+            })
+            
 
+    })
 
 });
 
