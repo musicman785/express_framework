@@ -14,6 +14,8 @@ const PORT = process.env.PORT || 8080;
 // Sets up the Express app to handle data parsing
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+//Uses express static method for index.js and css folders
+app.use(express.static(path.join(__dirname, "public")));
 //Array to hold note objects created
 let notes = [];
 
@@ -25,11 +27,11 @@ app.get("/api/notes", (req, res) => {
         if(err)
         throw err;
         let noteData = JSON.parse(data);
-        res.json(noteDAta);
+        res.json(noteData);
     })
    
 });
-   
+   // Question: why is the array notes being overwritten? 
 app.post("/api/notes", (req, res) => {
     let newNote = req.body;
 
@@ -48,7 +50,7 @@ app.post("/api/notes", (req, res) => {
     console.log(notes);
   }); 
 
-// Routes Question: Do I need a 404 error route?
+// Routes  Question: Do I need a 404 error route?
 // =============================================================
 app.get("/notes", (req, res) => {
   res.sendFile(__dirname + "/public/notes.html");
@@ -57,7 +59,14 @@ app.get("/notes", (req, res) => {
 app.get("*", (req, res) => {
     res.sendFile(__dirname + "/public/index.html");
 })
-
+// Route for CSS folder
+app.get("/notes", (req, res) => {
+    res.sendFile(__dirname + "/public/assets/css/styles.css")
+});
+//Route for index.js folder
+app.get("/notes", (req, res) => {
+    res.sendFile(__dirname + "/public/assets/js/index.js")
+});
 
 
 
