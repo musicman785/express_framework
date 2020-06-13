@@ -32,6 +32,24 @@ app.get("/api/notes", (req, res) => {
 
 });
 
+app.get("/api/notes/:Title", (req, res) => {
+    fs.readFile(__dirname + "/db/db.json", (err, data) => {
+        if (err)
+            throw err;
+        
+        let noteData = JSON.parse(data);
+        
+             
+        notes =  noteData.filter(note => {
+        
+            return note.Title.toLowerCase() === req.params.Title.toLowerCase();
+        
+        });
+        res.json(notes);
+    })
+     
+});
+
 // Question: why is the array notes being overwritten? 
 
 //API POST call routes 
