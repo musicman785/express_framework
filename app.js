@@ -4,6 +4,7 @@ const express = require("express");
 const path = require("path");
 //variable that requires fs module
 const fs = require("fs");
+//Parses incoming requests with JSON
 const { json } = require("express");
 
 // variable instanciates express framework
@@ -39,8 +40,7 @@ app.get("/api/notes/:Title", (req, res) => {
         
         let noteData = JSON.parse(data);
         
-             
-        notes =  noteData.filter(note => {
+             notes =  noteData.filter(note => {
         
             return note.Title.toLowerCase() === req.params.Title.toLowerCase();
         
@@ -56,14 +56,19 @@ app.get("/api/notes/:Title", (req, res) => {
 //===============================================================
 app.post("/api/notes", (req, res) => {
 
-    let newNote = req.body;
-
-    fs.readFile(__dirname + "/db/db.json", "utf8", (err, data) => {
+  
+ fs.readFile(__dirname + "/db/db.json", "utf8", (err, data) => {
         if (err)
             throw err;
 
         let notes = JSON.parse(data)
-
+        
+        let newNote = {
+            id: notes.length + 1,
+            title: req.body.title,
+            text: req.body.text
+        }
+        
         notes.push(newNote);
 
 
@@ -71,37 +76,39 @@ app.post("/api/notes", (req, res) => {
         fs.writeFile(__dirname + "/db/db.json", JSON.stringify(notes), (err, data) => {
             if (err)
                 throw err;
-            else {
                 res.json(notes);
-            }
+            
         })
     })
 
 });
-app.delete("/api/notes/:Title", (req, res) => {
+app.delete("/api/notes/:id", (req, res) => {
+    
+    
     
     fs.readFile(__dirname + "/db/db.json", "utf8", (err, data) => {
         if (err)
             throw err;
 
-            const reqTitle = req.params.Title
+           
              
             let notes = JSON.parse(data);
-            
-             notes =  notes.filter(note => {
-            
-                return note.Title.toLowerCase() !== reqTitle.toLowerCase();
-            
-            });
            
-            res.json(notes);
+            const note = notes.find(n => n.id === parseInt(req.params.id)); 
+            
+            const index = notes.indexOf(note);
+
+            notes.splice(index, 1);
+
+         
+        
             
     fs.writeFile(__dirname + "/db/db.json", JSON.stringify(notes), (err, data) => {
                 if (err)
                     throw err;
-                else {
+                
                     res.json(notes);
-                }
+                
             })
             
 
